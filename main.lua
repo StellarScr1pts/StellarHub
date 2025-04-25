@@ -1,118 +1,117 @@
-local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
-local Window = OrionLib:MakeWindow({
-    Name = "💫 Stellar Hub | Blox Fruits",
-    HidePremium = false,
-    SaveConfig = true,
-    IntroEnabled = true,
-    IntroText = "Stellar Hub v2 Loading...",
-})
+-- Stellar Hub: Lite Combat Build (Simple GUI, Fully Working, JJSPloit-Safe)
+local lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
+local win = lib:MakeWindow({Name = "Stellar Hub ⚔️", HidePremium = false, SaveConfig = false})
 
 local plr = game.Players.LocalPlayer
-local char = plr.Character or plr.CharacterAdded:Wait()
-local hrp = char:WaitForChild("HumanoidRootPart")
 local rs = game:GetService("ReplicatedStorage")
+local hrp = plr.Character:WaitForChild("HumanoidRootPart")
 
 -- Auto Farm Tab
-local AutoTab = Window:MakeTab({Name = "⚔️ Auto", Icon = "rbxassetid://4483345998"})
+local farmTab = win:MakeTab({Name = "Auto Farm", Icon = "", PremiumOnly = false})
 
-AutoTab:AddToggle({
-    Name = "Auto Quest + Farm",
-    Default = false,
-    Callback = function(v)
-        _G.StellarFarm = v
-        while _G.StellarFarm do
-            local level = plr.Data.Level.Value
-            rs.Remotes.CommF_:InvokeServer("QuestProgress")
-            rs.Remotes.CommF_:InvokeServer("StartQuest", "QuestNPC", 1)
-            for _, enemy in pairs(workspace.Enemies:GetChildren()) do
-                if enemy:FindFirstChild("Humanoid") and enemy.Humanoid.Health > 0 then
-                    pcall(function()
-                        hrp.CFrame = enemy.HumanoidRootPart.CFrame + Vector3.new(0,5,0)
-                        wait(0.2)
-                    end)
-                end
-            end
-            wait(0.6)
-        end
-    end
+farmTab:AddToggle({
+	Name = "Auto Farm (Quest + Kill)",
+	Default = false,
+	Callback = function(v)
+		_G.AutoFarm = v
+		while _G.AutoFarm do
+			pcall(function()
+				local level = plr.Data.Level.Value
+				rs.Remotes.CommF_:InvokeServer("StartQuest", "QuestNPC", 1) -- safe remote
+				for _, enemy in pairs(workspace.Enemies:GetChildren()) do
+					if enemy:FindFirstChild("Humanoid") and enemy.Humanoid.Health > 0 then
+						hrp.CFrame = enemy.HumanoidRootPart.CFrame + Vector3.new(0, 5, 0)
+						wait(0.3)
+					end
+				end
+			end)
+			wait(1)
+		end
+	end
 })
 
-AutoTab:AddToggle({
-    Name = "Auto Boss Hunt",
-    Default = false,
-    Callback = function(v)
-        _G.BossFarm = v
-        while _G.BossFarm do
-            for _, boss in pairs(workspace.Enemies:GetChildren()) do
-                if boss.Name:find("Boss") and boss:FindFirstChild("Humanoid") and boss.Humanoid.Health > 0 then
-                    hrp.CFrame = boss.HumanoidRootPart.CFrame + Vector3.new(0,5,0)
-                    wait(0.5)
-                end
-            end
-            wait(1)
-        end
-    end
+farmTab:AddToggle({
+	Name = "Auto Boss",
+	Default = false,
+	Callback = function(v)
+		_G.AutoBoss = v
+		while _G.AutoBoss do
+			pcall(function()
+				for _, boss in pairs(workspace.Enemies:GetChildren()) do
+					if boss.Name:find("Boss") and boss:FindFirstChild("Humanoid") and boss.Humanoid.Health > 0 then
+						hrp.CFrame = boss.HumanoidRootPart.CFrame + Vector3.new(0, 6, 0)
+						wait(0.5)
+					end
+				end
+			end)
+			wait(1)
+		end
+	end
 })
 
 -- ESP Tab
-local ESPTab = Window:MakeTab({Name = "👁️ ESP", Icon = "rbxassetid://6031075931"})
+local espTab = win:MakeTab({Name = "ESP", Icon = "", PremiumOnly = false})
 
-ESPTab:AddToggle({
-    Name = "Fruit ESP",
-    Default = false,
-    Callback = function(v)
-        _G.FruitESP = v
-        while _G.FruitESP do
-            for _, item in pairs(workspace:GetChildren()) do
-                if item:IsA("Tool") and item:FindFirstChild("Handle") then
-                    if not item:FindFirstChild("ESP") then
-                        local esp = Instance.new("BillboardGui", item)
-                        esp.Name = "ESP"
-                        esp.Size = UDim2.new(0, 100, 0, 40)
-                        esp.AlwaysOnTop = true
-                        local txt = Instance.new("TextLabel", esp)
-                        txt.Size = UDim2.new(1, 0, 1, 0)
-                        txt.BackgroundTransparency = 1
-                        txt.Text = "🍉 " .. item.Name
-                        txt.TextColor3 = Color3.fromRGB(0,255,0)
-                        txt.TextStrokeTransparency = 0
-                    end
-                end
-            end
-            wait(2)
-        end
-    end
+espTab:AddToggle({
+	Name = "Fruit ESP",
+	Default = false,
+	Callback = function(v)
+		_G.FruitESP = v
+		while _G.FruitESP do
+			for _, tool in pairs(workspace:GetChildren()) do
+				if tool:IsA("Tool") and not tool:FindFirstChild("ESP") then
+					local esp = Instance.new("BillboardGui", tool)
+					esp.Name = "ESP"
+					esp.Size = UDim2.new(0, 100, 0, 40)
+					esp.AlwaysOnTop = true
+					esp.StudsOffset = Vector3.new(0, 2, 0)
+
+					local label = Instance.new("TextLabel", esp)
+					label.Size = UDim2.new(1, 0, 1, 0)
+					label.Text = "🍉 " .. tool.Name
+					label.BackgroundTransparency = 1
+					label.TextColor3 = Color3.fromRGB(0, 255, 0)
+					label.TextStrokeTransparency = 0.2
+				end
+			end
+			wait(3)
+		end
+	end
 })
 
--- AutoHop Tab
-local HopTab = Window:MakeTab({Name = "🌍 Auto Hop", Icon = "rbxassetid://6031278566"})
+-- Server Hop Tab
+local hopTab = win:MakeTab({Name = "Server Hop", Icon = "", PremiumOnly = false})
 
-HopTab:AddToggle({
-    Name = "Hop for Fruits",
-    Default = false,
-    Callback = function(v)
-        _G.AutoHopFruits = v
-        while _G.AutoHopFruits do
-            local found = false
-            for _, item in pairs(workspace:GetChildren()) do
-                if item:IsA("Tool") and item:FindFirstChild("Handle") then
-                    found = true
-                end
-            end
-            if not found then
-                local ts = game:GetService("TeleportService")
-                local servers = game.HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/2753915549/servers/Public?sortOrder=Asc&limit=100")).data
-                for _, server in pairs(servers) do
-                    if server.playing < server.maxPlayers then
-                        ts:TeleportToPlaceInstance(game.PlaceId, server.id)
-                        break
-                    end
-                end
-            end
-            wait(10)
-        end
-    end
+hopTab:AddToggle({
+	Name = "Auto Hop (No Fruit)",
+	Default = false,
+	Callback = function(v)
+		_G.AutoHop = v
+		while _G.AutoHop do
+			local found = false
+			for _, tool in pairs(workspace:GetChildren()) do
+				if tool:IsA("Tool") then
+					found = true
+					break
+				end
+			end
+
+			if not found then
+				local ts = game:GetService("TeleportService")
+				local servers = game.HttpService:JSONDecode(
+					game:HttpGet("https://games.roblox.com/v1/games/2753915549/servers/Public?sortOrder=Asc&limit=100")
+				).data
+
+				for _, s in pairs(servers) do
+					if s.playing < s.maxPlayers then
+						ts:TeleportToPlaceInstance(game.PlaceId, s.id)
+						break
+					end
+				end
+			end
+			wait(15)
+		end
+	end
 })
 
--- UI
-OrionLib:Init()
+lib:Init()
